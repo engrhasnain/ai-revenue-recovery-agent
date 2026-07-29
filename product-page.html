@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Revenue Recovery Agent — Product Page</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #FF6B00;
+      --orange-light: #FF8C38;
+      --black: #0D0D0D;
+      --dark: #1A1A1A;
+      --dark2: #252525;
+      --grey: #6B6B6B;
+      --light-grey: #F5F5F5;
+      --white: #FFFFFF;
+      --green: #22C55E;
+      --red: #EF4444;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--white);
+      color: var(--dark);
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(13,13,13,0.96);
+      backdrop-filter: blur(10px);
+      padding: 0 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .nav-logo {
+      font-size: 1.1rem; font-weight: 800; color: var(--white);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-logo span { color: var(--orange); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      color: #aaa; text-decoration: none; font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      background: var(--orange); color: var(--white);
+      padding: 8px 20px; border-radius: 6px;
+      font-size: 0.875rem; font-weight: 600;
+      text-decoration: none; transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--orange-light); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      background: var(--black);
+      display: flex; align-items: center;
+      padding: 120px 5% 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -200px; right: -100px;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(255,107,0,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-content { max-width: 640px; position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,107,0,0.12); border: 1px solid rgba(255,107,0,0.3);
+      color: var(--orange); padding: 6px 14px; border-radius: 100px;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; margin-bottom: 28px;
+    }
+    .hero-badge::before { content: '●'; font-size: 0.5rem; }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 800; line-height: 1.1;
+      color: var(--white); margin-bottom: 20px;
+    }
+    .hero h1 span { color: var(--orange); }
+    .hero p {
+      font-size: 1.125rem; color: #aaa; margin-bottom: 36px;
+      max-width: 520px; line-height: 1.7;
+    }
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--orange); color: var(--white);
+      padding: 14px 28px; border-radius: 8px;
+      font-size: 1rem; font-weight: 700;
+      text-decoration: none; transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { background: var(--orange-light); transform: translateY(-1px); }
+    .btn-secondary {
+      background: transparent; color: var(--white);
+      padding: 14px 28px; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      text-decoration: none; border: 1px solid #444;
+      transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+    .hero-stats {
+      display: flex; gap: 40px; margin-top: 56px;
+      padding-top: 40px; border-top: 1px solid #2a2a2a;
+    }
+    .stat-item { text-align: left; }
+    .stat-num {
+      font-size: 2rem; font-weight: 800; color: var(--orange);
+      line-height: 1;
+    }
+    .stat-label { font-size: 0.8rem; color: #666; margin-top: 4px; }
+
+    /* ── SHARED SECTION STYLES ── */
+    section { padding: 96px 5%; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--orange);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800; line-height: 1.2; color: var(--dark);
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 1.05rem; color: var(--grey);
+      max-width: 560px; line-height: 1.7; margin-bottom: 56px;
+    }
+    .center { text-align: center; }
+    .center .section-sub { margin-left: auto; margin-right: auto; }
+
+    /* ── PROBLEM ── */
+    .problem { background: var(--light-grey); }
+    .problem-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 40px; align-items: start;
+    }
+    .problem-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+    .problem-list li {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: var(--white); padding: 20px 24px;
+      border-radius: 10px; border-left: 3px solid var(--red);
+    }
+    .problem-list li .icon {
+      font-size: 1.4rem; flex-shrink: 0; margin-top: 2px;
+    }
+    .problem-list li h4 { font-size: 0.95rem; font-weight: 700; color: var(--dark); }
+    .problem-list li p { font-size: 0.875rem; color: var(--grey); margin-top: 4px; }
+    .problem-visual {
+      background: var(--dark); border-radius: 14px; padding: 32px;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .problem-visual h3 { color: #aaa; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px; }
+    .timeline-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 14px 0; border-bottom: 1px solid #2a2a2a;
+    }
+    .timeline-item:last-child { border-bottom: none; }
+    .t-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--orange); flex-shrink: 0; margin-top: 5px;
+    }
+    .t-dot.grey { background: #444; }
+    .timeline-item p { font-size: 0.875rem; color: #888; line-height: 1.5; }
+    .timeline-item strong { color: var(--white); }
+
+    /* ── SOLUTION ── */
+    .solution { background: var(--white); }
+    .solution-cards {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .sol-card {
+      background: var(--light-grey); border-radius: 12px;
+      padding: 28px 24px; border: 1px solid #eee;
+      transition: all 0.25s;
+    }
+    .sol-card:hover {
+      border-color: var(--orange); transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(255,107,0,0.1);
+    }
+    .sol-icon {
+      width: 48px; height: 48px; border-radius: 10px;
+      background: rgba(255,107,0,0.1); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 16px;
+    }
+    .sol-card h3 { font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .sol-card p { font-size: 0.875rem; color: var(--grey); line-height: 1.6; }
+
+    /* ── HOW IT WORKS ── */
+    .how { background: var(--black); }
+    .how .section-title { color: var(--white); }
+    .how .section-sub { color: #666; }
+    .how .section-label { color: var(--orange); }
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .step-card {
+      background: var(--dark2); border-radius: 14px;
+      padding: 32px; border: 1px solid #2a2a2a;
+      display: flex; gap: 24px; align-items: flex-start;
+      transition: border-color 0.2s;
+    }
+    .step-card:hover { border-color: var(--orange); }
+    .step-num {
+      font-size: 2.5rem; font-weight: 900; color: var(--orange);
+      line-height: 1; flex-shrink: 0; opacity: 0.6;
+    }
+    .step-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+    .step-card p { font-size: 0.875rem; color: #777; line-height: 1.6; }
+    .step-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .tag {
+      font-size: 0.72rem; font-weight: 600; padding: 3px 10px;
+      border-radius: 100px; background: rgba(255,107,0,0.1);
+      color: var(--orange); border: 1px solid rgba(255,107,0,0.2);
+    }
+
+    /* ── FEATURES ── */
+    .features { background: var(--light-grey); }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .feat-card {
+      background: var(--white); border-radius: 12px;
+      padding: 28px; border: 1px solid #eee;
+      transition: all 0.2s;
+    }
+    .feat-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+    .feat-card .icon { font-size: 1.8rem; margin-bottom: 14px; }
+    .feat-card h3 { font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .feat-card p { font-size: 0.875rem; color: var(--grey); line-height: 1.6; }
+
+    /* ── IMPACT ── */
+    .impact { background: var(--white); }
+    .impact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .impact-col { border-radius: 14px; padding: 36px; }
+    .impact-col.bad { background: #FFF5F5; border: 1px solid #FEE2E2; }
+    .impact-col.good { background: var(--dark); border: 1px solid #2a2a2a; }
+    .impact-col h3 {
+      font-size: 1.1rem; font-weight: 800; margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .impact-col.bad h3 { color: var(--red); }
+    .impact-col.good h3 { color: var(--white); }
+    .impact-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+    .impact-list li {
+      display: flex; gap: 12px; align-items: flex-start;
+      font-size: 0.9rem; line-height: 1.5;
+    }
+    .impact-col.bad .impact-list li { color: #7f1d1d; }
+    .impact-col.good .impact-list li { color: #aaa; }
+    .mark { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── LANGUAGES ── */
+    .languages { background: var(--black); padding: 64px 5%; }
+    .lang-title { text-align: center; color: var(--white); margin-bottom: 8px; font-size: 1.5rem; font-weight: 700; }
+    .lang-sub { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 36px; }
+    .lang-chips { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+    .lang-chip {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--dark2); border: 1px solid #2a2a2a;
+      padding: 10px 20px; border-radius: 100px;
+      font-size: 0.875rem; color: var(--white);
+    }
+    .lang-chip .flag { font-size: 1.2rem; }
+    .channels-row { display: flex; justify-content: center; gap: 24px; margin-top: 40px; flex-wrap: wrap; }
+    .channel-pill {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,107,0,0.08); border: 1px solid rgba(255,107,0,0.25);
+      padding: 12px 24px; border-radius: 100px;
+      font-size: 0.9rem; color: var(--orange); font-weight: 600;
+    }
+
+    /* ── TECH STACK ── */
+    .tech { background: var(--light-grey); }
+    .tech-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .tech-card {
+      background: var(--white); border-radius: 10px;
+      padding: 20px 24px; border: 1px solid #eee;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .tech-card .t-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .tech-card h4 { font-size: 0.9rem; font-weight: 700; color: var(--dark); }
+    .tech-card p { font-size: 0.78rem; color: var(--grey); margin-top: 2px; }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: var(--orange);
+      padding: 96px 5%; text-align: center;
+    }
+    .cta-section h2 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800; color: var(--white); margin-bottom: 16px;
+    }
+    .cta-section p { color: rgba(255,255,255,0.8); font-size: 1.1rem; margin-bottom: 36px; }
+    .btn-white {
+      background: var(--white); color: var(--orange);
+      padding: 16px 36px; border-radius: 8px;
+      font-size: 1rem; font-weight: 800;
+      text-decoration: none; transition: all 0.2s;
+      display: inline-block;
+    }
+    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,0,0,0.2); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--black); padding: 40px 5%;
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid #1f1f1f; flex-wrap: wrap; gap: 16px;
+    }
+    footer p { color: #555; font-size: 0.85rem; }
+    footer span { color: var(--orange); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .problem-grid, .steps-grid, .impact-grid { grid-template-columns: 1fr; }
+      .solution-cards, .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .tech-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-stats { gap: 24px; }
+    }
+    @media (max-width: 600px) {
+      .solution-cards, .features-grid, .tech-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .hero-stats { flex-direction: column; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════ NAV ══════════════════ -->
+<nav>
+  <div class="nav-logo">Code<span>Thread</span></div>
+  <ul class="nav-links">
+    <li><a href="#problem">The Problem</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#impact">Impact</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">Book a Demo</a>
+</nav>
+
+<!-- ══════════════════ HERO ══════════════════ -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">AI Agent · Revenue Recovery</div>
+    <h1>Stop Chasing<br><span>Unpaid Invoices</span><br>Manually.</h1>
+    <p>
+      An AI-powered collections assistant that sends the right message, to the right
+      client, in the right language — and tells you exactly when to escalate.
+    </p>
+    <div class="hero-btns">
+      <a href="#cta" class="btn-primary">📅 Book a Demo</a>
+      <a href="#how" class="btn-secondary">See How It Works →</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">7</div>
+        <div class="stat-label">Languages Supported</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Delivery Channels</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">90-day</div>
+        <div class="stat-label">Cash Flow Forecast</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">AI</div>
+        <div class="stat-label">Powered by Claude</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ PROBLEM ══════════════════ -->
+<section class="problem" id="problem">
+  <div class="section-label">The Problem</div>
+  <h2 class="section-title">Manual invoice chasing<br>is costing you more than time.</h2>
+  <p class="section-sub">
+    Every business that sends invoices faces the same nightmare. The traditional
+    process is slow, inconsistent, and leaks cash — every single month.
+  </p>
+
+  <div class="problem-grid">
+    <ul class="problem-list">
+      <li>
+        <div class="icon">⏰</div>
+        <div>
+          <h4>Hours wasted every week</h4>
+          <p>Finance teams spend 5–15 hours per week manually checking overdue invoices and writing follow-up emails.</p>
+        </div>
+      </li>
+      <li>
+        <div class="icon">📧</div>
+        <div>
+          <h4>Generic emails get ignored</h4>
+          <p>Copy-paste templates feel impersonal. Clients ignore them — especially international clients getting messages in the wrong language.</p>
+        </div>
+      </li>
+      <li>
+        <div class="icon">📊</div>
+        <div>
+          <h4>No prioritization</h4>
+          <p>Teams treat a $500 invoice the same as a $50,000 one. No risk scoring. No strategy. Just guesswork.</p>
+        </div>
+      </li>
+      <li>
+        <div class="icon">💸</div>
+        <div>
+          <h4>Cash flow is unpredictable</h4>
+          <p>No one knows when the money will actually arrive. Business owners plan on gut feel, not data.</p>
+        </div>
+      </li>
+    </ul>
+
+    <div class="problem-visual">
+      <h3>The Typical Recovery Cycle</h3>
+      <div class="timeline-item">
+        <div class="t-dot"></div>
+        <p><strong>Day 1</strong> — Invoice sent. No payment received.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="t-dot grey"></div>
+        <p><strong>Day 7</strong> — Someone manually sends a reminder email. Generic template.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="t-dot grey"></div>
+        <p><strong>Day 14</strong> — Still no reply. Another email. Getting awkward.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="t-dot grey"></div>
+        <p><strong>Day 21</strong> — A phone call. Client asks for "more time."</p>
+      </div>
+      <div class="timeline-item">
+        <div class="t-dot grey"></div>
+        <p><strong>Day 30+</strong> — <strong style="color:#ef4444">Invoice gets written off.</strong> Cash is lost.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ SOLUTION ══════════════════ -->
+<section class="solution" id="solution">
+  <div class="center">
+    <div class="section-label">The Solution</div>
+    <h2 class="section-title">Meet your AI-powered<br>collections assistant.</h2>
+    <p class="section-sub">
+      The AI Revenue Recovery Agent replaces the entire manual process with a
+      proactive, intelligent, fully automated system.
+    </p>
+  </div>
+  <div class="solution-cards">
+    <div class="sol-card">
+      <div class="sol-icon">🎯</div>
+      <h3>Risk Classification</h3>
+      <p>Automatically classifies every customer as Low, Medium, or High risk based on days overdue, amount, and history.</p>
+    </div>
+    <div class="sol-card">
+      <div class="sol-icon">🧠</div>
+      <h3>Smart Recommendations</h3>
+      <p>AI recommends the exact next action — send a reminder, wait, escalate, or call — with plain-English reasoning.</p>
+    </div>
+    <div class="sol-card">
+      <div class="sol-icon">✉️</div>
+      <h3>Personalized Messages</h3>
+      <p>Generates tailored payment reminders in the right language, tone, and format for every individual client.</p>
+    </div>
+    <div class="sol-card">
+      <div class="sol-icon">📈</div>
+      <h3>Cash Flow Forecast</h3>
+      <p>Predicts how much you'll collect in the next 30, 60, and 90 days using AI-powered risk probability models.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ HOW IT WORKS ══════════════════ -->
+<section class="how" id="how">
+  <div class="center">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title" style="color:var(--white)">From overdue to paid —<br>in four intelligent steps.</h2>
+    <p class="section-sub">No manual chasing. No guesswork. Just a clear, AI-driven process from start to payment.</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <div>
+        <h3>Add Your Customers & Invoices</h3>
+        <p>Enter customers and their invoices manually, or upload a PDF. The AI reads it using computer vision and extracts all the data automatically — no typing needed.</p>
+        <div class="step-tags">
+          <span class="tag">PDF Upload</span>
+          <span class="tag">Auto-extraction</span>
+          <span class="tag">Bulk Import</span>
+        </div>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <div>
+        <h3>AI Classifies Risk & Recommends Action</h3>
+        <p>The AI evaluates every overdue invoice, assigns a risk level, and tells you exactly what to do next — with urgency level and full reasoning.</p>
+        <div class="step-tags">
+          <span class="tag">Low / Medium / High Risk</span>
+          <span class="tag">Next-Action AI</span>
+        </div>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <div>
+        <h3>AI Generates & Sends Personalized Reminders</h3>
+        <p>The right message — in the client's language, the right tone, and on the right channel (Email, WhatsApp, or SMS) — sent with one click.</p>
+        <div class="step-tags">
+          <span class="tag">7 Languages</span>
+          <span class="tag">Email · WhatsApp · SMS</span>
+          <span class="tag">5 Reminder Types</span>
+        </div>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">04</div>
+      <div>
+        <h3>Track Cash Flow & Get Weekly Reports</h3>
+        <p>Monitor what's collected, what's at risk, and when to expect payment. Get an AI-written weekly intelligence report with actionable next steps.</p>
+        <div class="step-tags">
+          <span class="tag">30/60/90-day Forecast</span>
+          <span class="tag">Weekly AI Report</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ FEATURES ══════════════════ -->
+<section class="features" id="features">
+  <div class="center">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything you need to<br>recover revenue, intelligently.</h2>
+    <p class="section-sub">A full suite of AI-powered tools — from first reminder to final escalation.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="icon">🔍</div>
+      <h3>Automatic Overdue Detection</h3>
+      <p>The system scans all invoices daily. The moment a due date passes, it's flagged as overdue and days-overdue is calculated in real time.</p>
+    </div>
+    <div class="feat-card">
+      <div class="icon">🚦</div>
+      <h3>AI Risk Scoring</h3>
+      <p>Every customer gets a risk level — Low (88% recovery), Medium (60%), or High (25%) — with written reasoning from the AI.</p>
+    </div>
+    <div class="feat-card">
+      <div class="icon">🌍</div>
+      <h3>Multi-Language Reminders</h3>
+      <p>Sends messages in the client's native language. Supports English, Arabic, German, French, Spanish, Japanese, and Portuguese.</p>
+    </div>
+    <div class="feat-card">
+      <div class="icon">📱</div>
+      <h3>Multi-Channel Delivery</h3>
+      <p>Email via SMTP, WhatsApp via Twilio Business API, or SMS. The AI recommends which channel to use for each client.</p>
+    </div>
+    <div class="feat-card">
+      <div class="icon">💬</div>
+      <h3>Response Analysis</h3>
+      <p>Log what the client replied. The AI reads their intent (Will Pay, Dispute, Hardship, Request Plan) and recommends what to do next.</p>
+    </div>
+    <div class="feat-card">
+      <div class="icon">📋</div>
+      <h3>Payment Plan Management</h3>
+      <p>Generate structured installment plans for clients who can't pay in full. Track each installment and send automated plan reminders.</p>
+    </div>
+    <div class="feat-card">
+      <div class="icon">📊</div>
+      <h3>Live Analytics Dashboard</h3>
+      <p>Total billed, collected, outstanding, collection rate, aging buckets (0–30, 31–60, 61–90, 90+ days), and top overdue invoices.</p>
+    </div>
+    <div class="feat-card">
+      <div class="icon">🤖</div>
+      <h3>AI Weekly Intelligence Report</h3>
+      <p>A full executive-level report written by AI — metrics, risk alerts, channel performance, cash flow forecast, and priority actions.</p>
+    </div>
+    <div class="feat-card">
+      <div class="icon">📄</div>
+      <h3>PDF Invoice Extraction</h3>
+      <p>Upload a PDF or photo of any invoice. The AI reads it using computer vision and fills in all the data automatically.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ IMPACT ══════════════════ -->
+<section class="impact" id="impact">
+  <div class="center">
+    <div class="section-label">Business Impact</div>
+    <h2 class="section-title">The difference is measurable.</h2>
+    <p class="section-sub">See what changes when you replace manual collections with intelligent automation.</p>
+  </div>
+  <div class="impact-grid">
+    <div class="impact-col bad">
+      <h3>❌ Without the Agent</h3>
+      <ul class="impact-list">
+        <li><span class="mark">✗</span> 5–15 hours per week chasing invoices manually</li>
+        <li><span class="mark">✗</span> Generic emails get ignored — especially by international clients</li>
+        <li><span class="mark">✗</span> No prioritization between small and large invoices</li>
+        <li><span class="mark">✗</span> Cash flow planning is based on gut feel</li>
+        <li><span class="mark">✗</span> Escalation is delayed or inconsistent</li>
+        <li><span class="mark">✗</span> Payment plans are offered inconsistently or not at all</li>
+        <li><span class="mark">✗</span> Debt written off without exhausting recovery options</li>
+      </ul>
+    </div>
+    <div class="impact-col good">
+      <h3 style="color:var(--orange)">✓ With the Agent</h3>
+      <ul class="impact-list">
+        <li><span class="mark" style="color:var(--green)">✓</span> Finance team focuses only on exceptions — AI handles the rest</li>
+        <li><span class="mark" style="color:var(--green)">✓</span> Every message is personalized — tone, language, and channel</li>
+        <li><span class="mark" style="color:var(--green)">✓</span> High-risk, high-value invoices automatically prioritized</li>
+        <li><span class="mark" style="color:var(--green)">✓</span> 30/60/90-day cash flow forecasts with confidence levels</li>
+        <li><span class="mark" style="color:var(--green)">✓</span> Escalation happens at exactly the right time</li>
+        <li><span class="mark" style="color:var(--green)">✓</span> Payment plans offered intelligently to clients showing hardship</li>
+        <li><span class="mark" style="color:var(--green)">✓</span> Every recovery option exhausted before write-off</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ LANGUAGES ══════════════════ -->
+<section class="languages">
+  <div class="lang-title">Built for Global Businesses</div>
+  <div class="lang-sub">Auto-detects the client's country and sends in their native language.</div>
+  <div class="lang-chips">
+    <div class="lang-chip"><span class="flag">🇬🇧</span> English</div>
+    <div class="lang-chip"><span class="flag">🇩🇪</span> German</div>
+    <div class="lang-chip"><span class="flag">🇫🇷</span> French</div>
+    <div class="lang-chip"><span class="flag">🇪🇸</span> Spanish</div>
+    <div class="lang-chip"><span class="flag">🇯🇵</span> Japanese</div>
+    <div class="lang-chip"><span class="flag">🇸🇦</span> Arabic</div>
+    <div class="lang-chip"><span class="flag">🇧🇷</span> Portuguese</div>
+  </div>
+  <div class="channels-row">
+    <div class="channel-pill">📧 Email</div>
+    <div class="channel-pill">💬 WhatsApp</div>
+    <div class="channel-pill">📱 SMS</div>
+  </div>
+</section>
+
+<!-- ══════════════════ TECH STACK ══════════════════ -->
+<section class="tech">
+  <div class="center">
+    <div class="section-label">Built With</div>
+    <h2 class="section-title">Enterprise-grade tech stack.</h2>
+    <p class="section-sub">Built on modern, production-ready tools. Works in demo mode with zero setup.</p>
+  </div>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="t-icon">⚡</div>
+      <div>
+        <h4>FastAPI</h4>
+        <p>Python async backend — high performance REST API</p>
+      </div>
+    </div>
+    <div class="tech-card">
+      <div class="t-icon">▲</div>
+      <div>
+        <h4>Next.js 15</h4>
+        <p>React 19 frontend with TypeScript and Tailwind CSS</p>
+      </div>
+    </div>
+    <div class="tech-card">
+      <div class="t-icon">🤖</div>
+      <div>
+        <h4>Claude AI</h4>
+        <p>Anthropic's Claude for all intelligent decision-making</p>
+      </div>
+    </div>
+    <div class="tech-card">
+      <div class="t-icon">📲</div>
+      <div>
+        <h4>Twilio</h4>
+        <p>WhatsApp Business API and SMS delivery at scale</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ CTA ══════════════════ -->
+<section class="cta-section" id="cta">
+  <h2>Ready to stop chasing payments?</h2>
+  <p>Let the AI handle collections. You focus on growing the business.</p>
+  <a href="#" class="btn-white">Book a Demo →</a>
+</section>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer>
+  <p>© 2025 <span>CodeThread</span>. AI Revenue Recovery Agent.</p>
+  <p>Built with FastAPI · Next.js · <span>Claude AI</span> · Twilio</p>
+</footer>
+
+</body>
+</html>

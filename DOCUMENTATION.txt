@@ -1,0 +1,770 @@
+================================================================================
+  AI REVENUE RECOVERY AGENT — PROJECT DOCUMENTATION
+  Version 1.0 | Built by Hasnain | Powered by Claude AI (Anthropic)
+================================================================================
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  TABLE OF CONTENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1.  The Problem
+  2.  What This Agent Solves
+  3.  Who This Is Built For
+  4.  Key Features at a Glance
+  5.  How It Works — Implementation Flow
+  6.  The AI Brain — What Claude Does Inside
+  7.  Tech Stack
+  8.  System Architecture
+  9.  Database Structure
+  10. API Reference Summary
+  11. Multi-Language & Multi-Channel Support
+  12. Demo Mode vs. Live Mode
+  13. Real Business Impact
+  14. Future Roadmap
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. THE PROBLEM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Every business that sends invoices faces the same nightmare: clients who don't pay
+on time. This is called the Accounts Receivable (AR) problem, and it is one of the
+most expensive and time-consuming challenges in business operations.
+
+Here is what the traditional process looks like today:
+
+  - A finance team member manually checks which invoices are overdue
+  - They write a polite reminder email — usually a generic template
+  - The client ignores it
+  - They wait a week and write another email — slightly firmer this time
+  - Still no reply
+  - Someone makes a phone call
+  - The client asks for "more time"
+  - The cycle repeats for weeks or months
+
+The result?
+
+  → Cash flow is delayed or lost entirely
+  → Finance staff spend hours on repetitive, manual follow-up tasks
+  → The tone of reminders is inconsistent — too soft or too aggressive
+  → International clients receive messages in the wrong language or wrong format
+  → There is no visibility into which customers are at high risk of not paying
+  → Businesses have no reliable forecast of when money will actually arrive
+  → Opportunities to offer payment plans (and recover partial cash) are missed
+  → No one knows which communication channel actually works for each client
+
+This is not a small problem. Globally, late invoice payments cost businesses
+trillions of dollars in lost revenue and productivity every single year.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  2. WHAT THIS AGENT SOLVES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The AI Revenue Recovery Agent is an end-to-end intelligent platform that completely
+transforms how businesses recover overdue payments. It replaces manual, reactive
+chasing with a proactive, data-driven, AI-powered recovery system.
+
+Instead of a finance team member guessing what to do next, the AI:
+
+  ✦  CLASSIFIES every customer by payment risk level (Low / Medium / High)
+     based on how overdue they are, how much they owe, and their history
+
+  ✦  RECOMMENDS the exact next action to take — send a reminder, wait, escalate,
+     or call — with reasoning explained in plain English
+
+  ✦  GENERATES personalized payment reminder messages automatically, choosing the
+     right tone, channel, and language for each individual customer
+
+  ✦  ANALYZES customer responses to understand their intent — are they going to pay,
+     disputing, struggling, or ignoring? — and adjusts strategy accordingly
+
+  ✦  PREDICTS cash flow recovery across the next 30, 60, and 90 days using
+     risk-weighted probability models
+
+  ✦  PRODUCES weekly intelligence reports — AI-written summaries with executive
+     insights, risk alerts, channel performance, and recommended actions
+
+  ✦  EXTRACTS invoice data from uploaded PDFs or images using computer vision,
+     eliminating manual data entry
+
+  ✦  MANAGES payment plans for clients who cannot pay in full, tracking installments
+     and sending automated plan reminders
+
+In short: this system turns accounts receivable from a manual, stressful,
+inconsistent process into an intelligent automated operation — recovering more
+money, faster, with less human effort.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  3. WHO THIS IS BUILT FOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This agent is built for any business that sends invoices and struggles with late
+payments. The most relevant use cases include:
+
+  → Small and medium businesses (SMBs) with limited finance teams who cannot
+    afford to have someone chasing payments full-time
+
+  → Freelancers and agencies who work with multiple clients and lose track of
+    which invoices need follow-up
+
+  → B2B companies with international clients where language and cultural
+    differences make payment follow-up awkward or ineffective
+
+  → Finance and accounts receivable teams at larger organizations who want to
+    automate the manual, low-skill parts of their job and focus on escalations
+
+  → SaaS companies and subscription businesses tracking recurring payment failures
+
+  → Any organization wanting real-time cash flow visibility and predictive
+    financial intelligence without expensive enterprise AR software
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  4. KEY FEATURES AT A GLANCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  CUSTOMER MANAGEMENT
+  ├─ Create and manage customer profiles (name, email, phone, WhatsApp, country)
+  ├─ AI-assigned risk level: Low / Medium / High
+  ├─ Real-time outstanding balance tracking
+  └─ Search and filter by name, email, company, or risk level
+
+  INVOICE MANAGEMENT
+  ├─ Create invoices with number, amount, currency, and due date
+  ├─ Automatic overdue detection when due date passes
+  ├─ Status tracking: Pending → Overdue → Paid / Disputed / Escalated / Written Off
+  ├─ Invoice extraction from PDF and image uploads (AI-powered)
+  └─ Bulk import of multiple invoices via document upload
+
+  AI RISK CLASSIFICATION
+  ├─ Analyzes days overdue, total amount, reminder count, and payment history
+  ├─ Assigns risk level with reasoning
+  └─ Estimated recovery rates: Low = 88%, Medium = 60%, High = 25%
+
+  SMART REMINDER SYSTEM
+  ├─ 5 reminder types: First Notice, Second Notice, Final Notice, Payment Plan Offer, Escalation
+  ├─ 3 delivery channels: Email, WhatsApp, SMS
+  ├─ 7 language support: English, German, French, Japanese, Spanish, Arabic, Portuguese
+  ├─ AI recommends which type, channel, and tone to use next
+  └─ Every message is personalized to the customer, invoice, and situation
+
+  CUSTOMER RESPONSE ANALYSIS
+  ├─ Log what the customer said in reply
+  ├─ AI reads intent: Will Pay, Dispute, Hardship, Ignoring, Payment Plan Request, Paid
+  ├─ Analyzes sentiment: Positive, Neutral, Negative
+  └─ Recommends follow-up action based on response
+
+  CASH FLOW PREDICTION
+  ├─ Risk-weighted recovery probability per invoice
+  ├─ 30-day, 60-day, and 90-day collection forecasts
+  ├─ Confidence levels and prediction reasoning
+  └─ Actionable financial planning intelligence
+
+  ANALYTICS DASHBOARD
+  ├─ Total billed, collected, outstanding, and collection rate
+  ├─ Invoice breakdown by status (charts and counts)
+  ├─ Customer risk distribution visualization
+  ├─ Top 5 most overdue invoices
+  ├─ Reminder statistics: sent, delivered, failed
+  └─ Overdue aging report: 0-30 / 31-60 / 61-90 / 90+ days
+
+  AI WEEKLY INTELLIGENCE REPORT
+  ├─ AI-written executive summary in professional markdown format
+  ├─ Key performance metrics table
+  ├─ Channel and language performance analysis
+  ├─ Risk alerts and escalation recommendations
+  ├─ Cash flow forecast narrative
+  └─ Printable / PDF-exportable format
+
+  PAYMENT PLANS
+  ├─ Generate flexible installment schedules for struggling clients
+  ├─ Weekly, biweekly, or monthly frequency options
+  └─ Status tracking: Active, Completed, Defaulted, Cancelled
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  5. HOW IT WORKS — IMPLEMENTATION FLOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Below is the complete step-by-step flow from onboarding a customer to recovering
+the payment and generating financial intelligence.
+
+────────────────────────────────────────────────────────────
+  STEP 1 — DATA ONBOARDING
+────────────────────────────────────────────────────────────
+
+The user adds their customers and their outstanding invoices into the system.
+
+  Customer data captured:
+    • Full name and company name
+    • Email address (for email reminders)
+    • Phone number (for SMS reminders)
+    • WhatsApp number (for WhatsApp reminders)
+    • Country (used to detect language automatically)
+
+  Invoice data captured:
+    • Invoice number
+    • Amount and currency (e.g., $5,000 USD)
+    • Due date
+    • Linked customer
+
+  Alternative: The user uploads a PDF or image of an invoice. The AI reads it
+  using computer vision (Claude's vision capability) and automatically extracts all
+  fields — no manual entry needed.
+
+────────────────────────────────────────────────────────────
+  STEP 2 — AUTOMATIC OVERDUE DETECTION
+────────────────────────────────────────────────────────────
+
+Every time the dashboard loads, the system automatically:
+
+  • Scans all invoices with status PENDING
+  • Checks if the due date has passed today's date
+  • Marks past-due invoices as OVERDUE
+  • Calculates the number of days overdue for each invoice
+  • Updates the total outstanding balance for each customer in real time
+
+This means the system always reflects the live state of the business's receivables
+without any manual intervention.
+
+────────────────────────────────────────────────────────────
+  STEP 3 — AI RISK CLASSIFICATION
+────────────────────────────────────────────────────────────
+
+The AI evaluates each customer and assigns a payment risk level.
+
+  Inputs the AI considers:
+    • Maximum days overdue across all invoices
+    • Total outstanding amount owed
+    • Total number of reminders already sent
+    • Payment history notes (if any)
+
+  Output:
+    • Risk Level: LOW / MEDIUM / HIGH
+    • Estimated recovery probability: Low=88%, Medium=60%, High=25%
+    • Reasoning: a plain-English explanation of why this risk level was assigned
+
+  This classification can be refreshed manually at any time, or it runs
+  automatically when reviewing a customer's profile.
+
+────────────────────────────────────────────────────────────
+  STEP 4 — AI NEXT-ACTION RECOMMENDATION
+────────────────────────────────────────────────────────────
+
+Before sending any reminder, the user can request the AI's recommendation on what
+to do next for a specific invoice. The AI analyzes:
+
+  • How many days the invoice has been overdue
+  • How many reminders have already been sent
+  • Which channel was used for the last reminder
+  • Whether the customer has responded — and what they said
+  • The customer's overall risk level
+
+  Output from the AI:
+    • Recommended action: Send Reminder / Escalate / Wait / Call
+    • Recommended channel: Email / WhatsApp / SMS
+    • Recommended reminder type: First Notice / Second Notice / Final Notice /
+                                  Payment Plan Offer / Escalation
+    • Urgency level: Low / Medium / High / Critical
+    • Reasoning: a plain-English explanation of the recommendation
+
+  The system pre-fills the reminder form with these recommendations.
+  The user can accept the suggestions or override any of them before sending.
+
+────────────────────────────────────────────────────────────
+  STEP 5 — AI MESSAGE GENERATION & DELIVERY
+────────────────────────────────────────────────────────────
+
+When the user clicks "Generate & Send," the AI creates a fully personalized
+payment reminder message. Here is exactly what happens:
+
+  5a. Language Detection
+      The system reads the customer's country.
+      It maps the country to a language:
+        Germany → German | France → French | Japan → Japanese
+        Spain / Mexico / Latin America → Spanish | UAE / Saudi Arabia → Arabic
+        Brazil / Portugal → Portuguese | All others → English
+
+  5b. Tone Selection
+      The reminder type determines the tone of the message:
+        First Notice      → Warm, friendly, assumes it was an oversight
+        Second Notice     → Firm, professional, references previous reminder
+        Final Notice      → Urgent, formal, warns of consequences
+        Payment Plan Offer → Helpful, empathetic, offers an alternative
+        Escalation        → Stern, legal-adjacent language
+
+  5c. Channel Formatting
+      The message is formatted per delivery channel:
+        Email   → Full subject line + formatted email body with greeting and signature
+        WhatsApp → Concise message with appropriate emoji usage for readability
+        SMS     → Ultra-short message under 160 characters
+
+  5d. Delivery
+      In demo mode, the message is logged to the console (no credentials needed).
+      In live mode, the message is dispatched via:
+        Email     → SMTP (Gmail or custom mail server)
+        WhatsApp  → Twilio WhatsApp Business API
+        SMS       → Twilio SMS
+
+  5e. Record Keeping
+      The reminder is saved to the database with:
+        • Full message content
+        • Channel used
+        • Reminder type
+        • Whether it was AI-generated
+        • Timestamp
+        • Delivery status: Sent / Delivered / Failed / Read
+
+  5f. Invoice Update
+      The invoice's reminder count increments by 1.
+      The "last reminder sent" timestamp is updated.
+
+────────────────────────────────────────────────────────────
+  STEP 6 — CUSTOMER RESPONSE LOGGING & ANALYSIS
+────────────────────────────────────────────────────────────
+
+When a customer replies to a reminder (by email, WhatsApp, etc.), the user logs
+the response text into the system. The AI then:
+
+  • Identifies the customer's INTENT:
+      Will Pay         → Customer confirms payment is coming
+      Dispute          → Customer challenges the invoice amount or validity
+      Hardship         → Customer cannot pay due to financial difficulty
+      Ignoring         → Customer is unresponsive or dismissive
+      Request Plan     → Customer asks for a payment plan
+      Paid             → Customer claims they already paid
+      Other            → Ambiguous or unclassifiable response
+
+  • Assesses SENTIMENT: Positive / Neutral / Negative
+
+  • Recommends the NEXT ACTION based on this response:
+      "Will Pay" → Schedule a follow-up in 3 days to confirm receipt
+      "Dispute"  → Escalate to account manager for resolution
+      "Hardship" → Offer a payment plan
+      "Ignoring" → Send Final Notice or escalate
+
+  This closes the loop on the communication and keeps the strategy adaptive.
+
+────────────────────────────────────────────────────────────
+  STEP 7 — CASH FLOW FORECASTING
+────────────────────────────────────────────────────────────
+
+The AI calculates how much money the business can realistically expect to collect
+and when.
+
+  For each overdue invoice, the AI applies:
+    • Risk-level recovery rate (Low=88%, Medium=60%, High=25%)
+    • Time-decay factor (the longer overdue, the harder to collect)
+    • Days-overdue weighting
+
+  Results are aggregated into three buckets:
+    • Expected to collect within 30 days
+    • Expected to collect within 60 days
+    • Expected to collect within 90 days
+
+  Each forecast includes:
+    • Dollar amount expected
+    • Confidence level (High / Medium / Low)
+    • Basis for the prediction
+
+  This gives finance teams and business owners a data-backed picture of their
+  upcoming cash position — not guesswork.
+
+────────────────────────────────────────────────────────────
+  STEP 8 — ESCALATION
+────────────────────────────────────────────────────────────
+
+When soft reminders have failed and the AI recommends escalation (or the user
+decides manually), the system:
+
+  • Marks the invoice status as ESCALATED
+  • Sends an Escalation-type reminder — stern, formal, legal-adjacent tone
+  • Triggers the collections workflow
+  • Flags the customer as High Risk if not already classified
+
+Escalated invoices appear prominently in the dashboard and reports for visibility.
+
+────────────────────────────────────────────────────────────
+  STEP 9 — PAYMENT PLAN MANAGEMENT
+────────────────────────────────────────────────────────────
+
+For clients who cannot pay in full, the system supports structured payment plans:
+
+  • Generate a plan with a down payment and installment schedule
+  • Choose frequency: Weekly / Biweekly / Monthly
+  • System tracks each installment: due date, amount, paid or not
+  • Status automatically updates: Active → Completed / Defaulted / Cancelled
+  • Reminders can be sent per installment
+
+This approach recovers partial cash rather than losing the invoice entirely.
+
+────────────────────────────────────────────────────────────
+  STEP 10 — WEEKLY AI INTELLIGENCE REPORT
+────────────────────────────────────────────────────────────
+
+The system generates a professional AI-written intelligence report on demand
+(weekly, monthly, or quarterly). The report includes:
+
+  • Executive Summary — the state of receivables in plain English
+  • Key Metrics Table — total billed, collected, outstanding, collection rate
+  • Invoice Status Breakdown — how many in each status
+  • Customer Risk Analysis — distribution of Low/Medium/High risk customers
+  • Top Overdue Invoices — the most critical accounts to action immediately
+  • Channel Performance — which channel (email/WhatsApp/SMS) gets the best results
+  • Language Localization Impact — how multi-language outreach is performing
+  • Cash Flow Forecast — expected collections over the next 30/60/90 days
+  • Risk Alerts — customers approaching escalation thresholds
+  • Recommended Next Steps — prioritized, actionable items for the team
+
+The report is rendered in formatted markdown and can be printed or exported as PDF.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  6. THE AI BRAIN — WHAT CLAUDE DOES INSIDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The AI powering this system is Claude by Anthropic — one of the world's most
+advanced large language models. Here is a breakdown of every AI task in the system:
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  AI TASK                  │  WHAT CLAUDE DOES                          │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  Risk Classification      │  Reads customer data, reasons through      │
+  │                           │  overdue days, amount, history, assigns     │
+  │                           │  Low/Medium/High with written reasoning     │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  Next Action Recommend.   │  Reads invoice state, reminder history,    │
+  │                           │  last response, and recommends the optimal  │
+  │                           │  next action with channel and urgency       │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  Message Generation       │  Writes the full reminder message in the   │
+  │                           │  correct language, tone, and channel format │
+  │                           │  using customer/invoice context             │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  Response Analysis        │  Reads customer's reply, identifies intent  │
+  │                           │  and sentiment, recommends what to do next  │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  Cash Flow Prediction     │  Applies risk models and probability        │
+  │                           │  reasoning to predict collection timelines  │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  Invoice Extraction       │  Uses Claude's vision to read PDF/image     │
+  │                           │  invoices and extract all structured data   │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  Intelligence Report      │  Writes a full professional report with     │
+  │                           │  analysis, insights, forecasts, and actions │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  7. TECH STACK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  BACKEND
+  ├─ Language:     Python 3.11+
+  ├─ Framework:    FastAPI (async-first, high-performance REST API)
+  ├─ Package Mgr:  uv (fast modern Python package manager)
+  ├─ Database:     SQLite (via aiosqlite for async, SQLAlchemy 2.0 ORM)
+  ├─ AI Engine:    Anthropic Claude API (claude-haiku + claude-opus)
+  ├─ Email:        SMTP (Gmail compatible)
+  └─ Messaging:    Twilio (WhatsApp Business API + SMS)
+
+  FRONTEND
+  ├─ Framework:    Next.js 15 (React 19, TypeScript)
+  ├─ Styling:      Tailwind CSS
+  ├─ Charts:       Recharts (bar charts, pie charts, area charts)
+  ├─ HTTP Client:  Axios
+  ├─ UI Library:   Radix UI primitives
+  ├─ Icons:        Lucide React
+  └─ Notifications: React Hot Toast
+
+  DEPLOYMENT
+  ├─ Backend:      Runs on port 8000 (via uvicorn)
+  └─ Frontend:     Runs on port 3000 (via Next.js dev or production build)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  8. SYSTEM ARCHITECTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │                          FRONTEND (Next.js)                             │
+  │   Dashboard | Customers | Invoices | Reminders                          │
+  │   Charts, Forms, Tables, Report Viewer                                  │
+  └────────────────────────┬────────────────────────────────────────────────┘
+                           │  REST API calls (Axios)
+                           ▼
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │                          BACKEND (FastAPI)                              │
+  │                                                                         │
+  │   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐              │
+  │   │   Customers  │   │   Invoices   │   │   Reminders  │              │
+  │   │    Router    │   │    Router    │   │    Router    │              │
+  │   └──────┬───────┘   └──────┬───────┘   └──────┬───────┘              │
+  │          └──────────────────┼──────────────────┘                       │
+  │                             ▼                                           │
+  │          ┌──────────────────────────────────┐                          │
+  │          │          Services Layer           │                          │
+  │          │                                   │                          │
+  │          │  AI Service     ← Claude API      │                          │
+  │          │  Recovery Svc   ← Invoice Logic   │                          │
+  │          │  Notify Svc     ← Email/WA/SMS    │                          │
+  │          └──────────────────┬────────────────┘                          │
+  │                             ▼                                           │
+  │          ┌──────────────────────────────────┐                          │
+  │          │     SQLite Database (aiosqlite)   │                          │
+  │          │  customers | invoices | reminders │                          │
+  │          │  payment_plans                    │                          │
+  │          └───────────────────────────────────┘                          │
+  └─────────────────────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+            ┌──────────────────────────┐
+            │  External Services       │
+            │  Claude AI (Anthropic)   │
+            │  Twilio (WA / SMS)       │
+            │  SMTP (Email)            │
+            └──────────────────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  9. DATABASE STRUCTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  TABLE: customers
+  ├─ id, name, email, phone, whatsapp, company
+  ├─ country, address
+  ├─ risk_level (LOW / MEDIUM / HIGH)
+  ├─ total_outstanding (auto-calculated)
+  └─ created_at, updated_at
+
+  TABLE: invoices
+  ├─ id, invoice_number, amount, currency
+  ├─ due_date, days_overdue (auto-calculated)
+  ├─ status (PENDING / OVERDUE / PAID / PARTIALLY_PAID / DISPUTED / ESCALATED / WRITTEN_OFF)
+  ├─ reminder_count, last_reminder_at
+  ├─ customer_id (foreign key → customers)
+  └─ created_at, updated_at
+
+  TABLE: reminders
+  ├─ id, channel (EMAIL / WHATSAPP / SMS)
+  ├─ reminder_type (FIRST_NOTICE / SECOND_NOTICE / FINAL_NOTICE / PAYMENT_PLAN_OFFER / ESCALATION)
+  ├─ message_subject, message_body
+  ├─ status (SENT / DELIVERED / FAILED / READ)
+  ├─ ai_generated (boolean)
+  ├─ language_used
+  ├─ response_received (boolean), response_text
+  ├─ customer_id, invoice_id (foreign keys)
+  └─ sent_at, created_at
+
+  TABLE: payment_plans
+  ├─ id, total_amount, down_payment
+  ├─ frequency (WEEKLY / BIWEEKLY / MONTHLY)
+  ├─ installment_amount, number_of_installments
+  ├─ status (ACTIVE / COMPLETED / DEFAULTED / CANCELLED)
+  ├─ customer_id, invoice_id (foreign keys)
+  └─ start_date, created_at
+
+  RELATIONSHIPS:
+  Customer → Invoices        (one customer has many invoices)
+  Customer → Reminders       (one customer has many reminders)
+  Customer → PaymentPlans    (one customer has many payment plans)
+  Invoice  → Reminders       (one invoice has many reminders)
+  Invoice  → PaymentPlans    (one invoice has one or more payment plans)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  10. API REFERENCE SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  All endpoints are under:  http://localhost:8000/api/v1
+
+  CUSTOMERS
+  ─────────
+  GET    /customers/                    List customers (search/filter by name, email, risk)
+  POST   /customers/                    Create a new customer
+  GET    /customers/{id}                Get customer details + stats
+  PATCH  /customers/{id}                Update customer info
+  DELETE /customers/{id}                Delete customer
+  POST   /customers/{id}/refresh-risk   Re-run AI risk classification
+
+  INVOICES
+  ────────
+  GET    /invoices/                     List invoices (filter by status, customer, date)
+  POST   /invoices/                     Create a new invoice
+  GET    /invoices/{id}                 Get invoice details
+  PATCH  /invoices/{id}                 Update invoice (status, due date, etc.)
+  DELETE /invoices/{id}                 Delete invoice
+  POST   /invoices/{id}/mark-paid       Mark invoice as fully paid
+  GET    /invoices/{id}/next-action     Get AI recommendation for next step
+  POST   /invoices/bulk-extract/        Upload PDF/image to extract invoice data (AI)
+
+  REMINDERS
+  ─────────
+  GET    /reminders/                    List reminders (filter by customer, invoice, channel)
+  POST   /reminders/generate-and-send   Generate AI message and send reminder
+  GET    /reminders/{id}                Get reminder details
+  POST   /reminders/{id}/resend         Resend an existing reminder
+  POST   /reminders/{id}/log-response   Log customer reply + AI intent analysis
+  POST   /reminders/escalate/{invoice_id}  Escalate an invoice
+
+  ANALYTICS
+  ─────────
+  GET    /analytics/dashboard            Summary stats, risk distribution, top overdue
+  GET    /analytics/overdue-aging        Aging buckets: 0-30 / 31-60 / 61-90 / 90+ days
+  GET    /analytics/cash-flow-prediction  30/60/90-day collection forecast
+  GET    /analytics/weekly-report        AI-generated intelligence report (weekly/monthly/quarterly)
+
+  HEALTH
+  ──────
+  GET    /                               {"status": "ok"}
+  GET    /health                         {"status": "healthy"}
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  11. MULTI-LANGUAGE & MULTI-CHANNEL SUPPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  SUPPORTED LANGUAGES (auto-detected from customer country):
+  ─────────────────────────────────────────────────────────
+  English     → Default / USA / UK / Australia / Canada / etc.
+  German      → Germany / Austria / Switzerland
+  French      → France / Belgium / Switzerland / Francophone Africa
+  Spanish     → Spain / Mexico / Colombia / Argentina / Latin America
+  Japanese    → Japan
+  Arabic      → UAE / Saudi Arabia / Egypt / Middle East
+  Portuguese  → Brazil / Portugal
+
+  SUPPORTED CHANNELS:
+  ───────────────────
+  Email       → Full subject + formatted body, professional greeting + signature
+  WhatsApp    → Conversational format, emoji-friendly, under 500 characters
+  SMS         → Maximum 160 characters, direct and action-focused
+
+  REMINDER TYPES × TONE MAPPING:
+  ───────────────────────────────
+  First Notice       → "This is a gentle reminder that invoice #XXX is now due..."
+  Second Notice      → "We previously sent a reminder on [date]. Payment is now overdue..."
+  Final Notice       → "This is your final notice. If payment is not received by [date]..."
+  Payment Plan Offer → "We understand circumstances can be challenging. We'd like to offer..."
+  Escalation         → "We regret to inform you that this matter is being escalated to..."
+
+  Every combination of language × channel × reminder type has a pre-built template
+  for demo mode, and a live AI-generated message when the API key is configured.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  12. DEMO MODE VS. LIVE MODE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  DEMO MODE (no API keys required):
+  ──────────────────────────────────
+  → All AI features work using deterministic, pre-built logic
+  → Messages use pre-written templates (still multi-language, multi-channel)
+  → Risk classification uses rule-based thresholds
+  → Cash flow predictions use fixed recovery rate formulas
+  → Messages are logged to the console (not actually sent)
+  → Perfect for demonstrations, client walkthroughs, and development
+
+  LIVE MODE (API keys configured in .env):
+  ─────────────────────────────────────────
+  → All AI tasks use Claude for intelligent, contextual responses
+  → Risk classification reasoning is dynamic and adaptive
+  → Message generation is fully personalized per customer and situation
+  → Actual emails sent via SMTP (Gmail or custom)
+  → Actual WhatsApp messages sent via Twilio Business API
+  → Actual SMS sent via Twilio
+
+  Environment variables for live mode:
+    ANTHROPIC_API_KEY     → Claude AI access
+    SMTP_HOST             → Email server host
+    SMTP_USER             → Email username
+    SMTP_PASSWORD         → Email password
+    TWILIO_ACCOUNT_SID    → Twilio account ID
+    TWILIO_AUTH_TOKEN     → Twilio auth token
+    TWILIO_WHATSAPP_FROM  → WhatsApp sender number
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  13. REAL BUSINESS IMPACT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  WITHOUT THIS AGENT:
+  ───────────────────
+  ✗ Finance teams spend 5-15 hours per week manually chasing invoices
+  ✗ Generic reminder emails get ignored because they feel impersonal
+  ✗ No prioritization — teams treat $500 invoices the same as $50,000 ones
+  ✗ International clients receive messages in the wrong language
+  ✗ No visibility into which communication channel works best
+  ✗ Cash flow forecasting is based on gut feel, not data
+  ✗ Escalation decisions are delayed due to lack of clear process
+  ✗ Payment plans are offered inconsistently or not at all
+  ✗ Businesses write off debt without exhausting every recovery option
+
+  WITH THIS AGENT:
+  ────────────────
+  ✓ Finance teams focus only on exceptions — the AI handles the routine
+  ✓ Every message is personalized — customer name, invoice amount, tone, language
+  ✓ High-risk, high-value invoices are automatically prioritized
+  ✓ International clients receive native-language messages — more likely to respond
+  ✓ Channel performance data guides future outreach strategy
+  ✓ Cash flow is predictable — 30/60/90-day forecasts with confidence levels
+  ✓ Escalation happens at the right time — not too early, not too late
+  ✓ Payment plans are intelligently offered to customers showing hardship signals
+  ✓ Every recovery option is exhausted before write-off, maximizing cash collected
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  14. FUTURE ROADMAP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  The following features are planned for future versions:
+
+  → Automated scheduling: reminders send automatically on a defined schedule
+    without any human triggering
+
+  → Stripe / QuickBooks / Xero integration: sync invoices directly from
+    accounting software — zero manual data entry
+
+  → Voice call reminders: AI-generated voice calls via Twilio Voice
+
+  → Customer portal: a link customers can click to view their invoice, make
+    payment, or request a plan directly
+
+  → Multi-user support: team accounts with role-based access control
+    (Finance Manager, Collections Agent, Admin)
+
+  → Webhook notifications: real-time events pushed to Slack or other tools
+    when a customer pays or responds
+
+  → CRM integration: sync customer risk scores and payment history into
+    Salesforce, HubSpot, or Pipedrive
+
+  → Advanced analytics: cohort analysis, payment behavior trends, reminder
+    effectiveness scoring, A/B testing of message variants
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  QUICK START
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  BACKEND:
+    cd backend
+    uv sync
+    uv run uvicorn src.app.main:app --reload --port 8000
+
+  FRONTEND:
+    cd frontend
+    npm install
+    npm run dev
+
+  Open browser at:  http://localhost:3000
+  API docs at:      http://localhost:8000/docs
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  END OF DOCUMENTATION
+  AI Revenue Recovery Agent | Built with FastAPI + Next.js + Claude AI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
