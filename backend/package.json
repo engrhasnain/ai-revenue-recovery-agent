@@ -1,0 +1,44 @@
+{
+  "name": "ai-revenue-recovery-backend",
+  "version": "1.0.0",
+  "description": "AI-powered revenue recovery system for automated invoice follow-up and payment collection (NestJS)",
+  "private": true,
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "prebuild": "prisma generate",
+    "build": "nest build",
+    "postinstall": "prisma generate",
+    "prestart": "prisma db push --accept-data-loss --skip-generate",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "prestart:prod": "prisma db push --accept-data-loss --skip-generate",
+    "start:prod": "node dist/main.js",
+    "seed": "prisma db push --accept-data-loss --skip-generate && ts-node -r tsconfig-paths/register scripts/seed.ts",
+    "lint": "eslint \"{src,scripts}/**/*.ts\""
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/core": "^11.0.1",
+    "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/schedule": "^5.0.1",
+    "@nestjs/throttler": "^6.2.1",
+    "@prisma/client": "^6.1.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "dotenv": "^16.4.7",
+    "multer": "1.4.5-lts.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@types/express": "^5.0.0",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.10.5",
+    "prisma": "^6.1.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.7.2"
+  }
+}

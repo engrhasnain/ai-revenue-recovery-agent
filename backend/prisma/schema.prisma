@@ -1,0 +1,104 @@
+// Prisma schema mirroring the archived SQLAlchemy models (Customer, Invoice,
+// PaymentPlan, Reminder) field-for-field. Field names are kept snake_case to
+// match the Python/pydantic JSON contract exactly, so API response builders
+// can pass values straight through without remapping keys.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id                Int      @id @default(autoincrement())
+  name              String
+  email             String   @unique
+  phone             String?
+  whatsapp          String?
+  company           String?
+  country           String?
+  address           String?
+  risk_level        String   @default("low")
+  total_outstanding Float    @default(0)
+  notes             String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  invoices      Invoice[]
+  payment_plans PaymentPlan[]
+  reminders     Reminder[]
+
+  @@map("customers")
+}
+
+model Invoice {
+  id               Int       @id @default(autoincrement())
+  invoice_number   String    @unique
+  customer_id      Int
+  amount           Float
+  amount_paid      Float     @default(0)
+  currency         String    @default("USD")
+  issue_date       DateTime
+  due_date         DateTime
+  status           String    @default("pending")
+  description      String?
+  days_overdue     Int       @default(0)
+  reminder_count   Int       @default(0)
+  last_reminder_at DateTime?
+  escalated_at     DateTime?
+  notes            String?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @default(now()) @updatedAt
+
+  customer      Customer      @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  payment_plans PaymentPlan[]
+  reminders     Reminder[]
+
+  @@map("invoices")
+}
+
+model PaymentPlan {
+  id                 Int      @id @default(autoincrement())
+  customer_id        Int
+  invoice_id         Int
+  total_amount       Float
+  installments       Int
+  installment_amount Float
+  frequency          String   @default("monthly")
+  start_date         DateTime
+  next_due_date      DateTime
+  amount_paid        Float    @default(0)
+  installments_paid  Int      @default(0)
+  status             String   @default("active")
+  created_at         DateTime @default(now())
+  updated_at         DateTime @default(now()) @updatedAt
+
+  customer Customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  invoice  Invoice  @relation(fields: [invoice_id], references: [id], onDelete: Cascade)
+
+  @@map("payment_plans")
+}
+
+model Reminder {
+  id                Int       @id @default(autoincrement())
+  customer_id       Int
+  invoice_id        Int
+  channel           String
+  reminder_type     String
+  status            String    @default("pending")
+  subject           String?
+  message           String
+  ai_generated      Boolean   @default(true)
+  sent_at           DateTime?
+  response_received Boolean   @default(false)
+  response_text     String?
+  created_at        DateTime  @default(now())
+
+  customer Customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  invoice  Invoice  @relation(fields: [invoice_id], references: [id], onDelete: Cascade)
+
+  @@map("reminders")
+}
