@@ -21,3 +21,4 @@ frontend/out/
 # OS/editor cruft
 .DS_Store
 Thumbs.db
+backend-fastapi-archive/
