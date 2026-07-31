@@ -128,26 +128,56 @@ function restoreEngineExecutePermissions(projectRoot: string) {
   dirs.forEach(walk);
 }
 
-async function ensureDatabaseSchema() {
+function log(msg: string) {
+  // eslint-disable-next-line no-console
+  console.log(`[schema-init ${new Date().toISOString()}] ${msg}`);
+}
+
+async function ensureDatabaseSchemaInner() {
   const projectRoot = path.join(__dirname, ".."); // dist/ -> project root
   const dbPath = path.join(projectRoot, "revenue_recovery.db");
 
   process.env.DATABASE_URL = `file:${dbPath}`;
-  restoreEngineExecutePermissions(projectRoot);
+  log(`DATABASE_URL set to file:${dbPath}`);
 
+  log("restoreEngineExecutePermissions: start");
+  restoreEngineExecutePermissions(projectRoot);
+  log("restoreEngineExecutePermissions: done");
+
+  log("new PrismaClient(): start");
   const prisma = new PrismaClient();
+  log("new PrismaClient(): done");
+
   try {
-    for (const statement of SCHEMA_SQL) {
-      await prisma.$executeRawUnsafe(statement);
+    for (let i = 0; i < SCHEMA_SQL.length; i++) {
+      log(`executeRawUnsafe[${i}]: start`);
+      await prisma.$executeRawUnsafe(SCHEMA_SQL[i]);
+      log(`executeRawUnsafe[${i}]: done`);
     }
-    // eslint-disable-next-line no-console
-    console.log("Database schema ensured (customers, invoices, payment_plans, reminders).");
+    log("Database schema ensured (customers, invoices, payment_plans, reminders).");
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error("Failed to create database schema:", err);
   } finally {
+    log("$disconnect(): start");
     await prisma.$disconnect();
+    log("$disconnect(): done");
   }
+}
+
+// Whatever is actually hanging here (still being diagnosed on Hostinger — see
+// the step-by-step "[schema-init]" log lines above/below this call), the
+// server must come up regardless: race the real setup against a hard
+// timeout so `app.listen()` always gets called within Hostinger's own
+// startup window, rather than the whole process going dark.
+async function ensureDatabaseSchema() {
+  const timeout = new Promise<void>((resolve) => {
+    setTimeout(() => {
+      log("TIMEOUT after 8s — proceeding to start the server anyway.");
+      resolve();
+    }, 8000);
+  });
+  await Promise.race([ensureDatabaseSchemaInner(), timeout]);
 }
 
 async function bootstrap() {
