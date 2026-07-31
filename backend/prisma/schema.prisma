@@ -7,13 +7,15 @@ generator client {
   provider = "prisma-client-js"
   // Prisma's own native query engine hangs indefinitely on Hostinger's
   // Node hosting on the very first query (confirmed via step-by-step
-  // startup logging on the sibling Lead-to-Deal project — likely the
-  // engine's internal process/thread model is blocked by their
-  // sandboxing). Driver adapters (stable, no preview flag needed) let
-  // Prisma Client's query API stay exactly the same everywhere it's used
-  // in the app, while swapping the actual SQLite access to
-  // better-sqlite3 — a much simpler, synchronous native binding with no
-  // separate engine process and no OpenSSL dependency.
+  // startup logging — likely the engine's internal process/thread model
+  // is blocked by their sandboxing). Driver adapters (stable, no preview
+  // flag needed) let Prisma Client's query API stay exactly the same
+  // everywhere it's used in the app, while swapping the actual SQLite
+  // access to libSQL — better-sqlite3 was tried first, but Hostinger's
+  // build container can't compile any native addon from source (its
+  // node-gyp requires Python 3.8+, the container only has 3.6.8), and
+  // libSQL's native binding ships as per-platform npm packages resolved
+  // directly by npm install — no node-gyp involved.
 }
 
 datasource db {

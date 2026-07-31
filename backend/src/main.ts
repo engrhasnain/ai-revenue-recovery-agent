@@ -2,7 +2,7 @@ import "dotenv/config";
 import "reflect-metadata";
 import * as path from "path";
 import { PrismaClient } from "@prisma/client";
-import { PrismaBetterSQLite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaLibSQL } from "@prisma/adapter-libsql";
 import { NestFactory } from "@nestjs/core";
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./app.module";
@@ -18,11 +18,11 @@ import { AppConfigService } from "./config/app-config.service";
 // engine entirely — on Hostinger the schema-engine binary panics at
 // startup, and even after routing around it, the native query engine hangs
 // indefinitely on its very first query (confirmed via step-by-step startup
-// logging). Both are replaced by the better-sqlite3 driver adapter (see
-// prisma.service.ts for the same swap on the app's normal query path) — the
-// exact CREATE TABLE/INDEX statements Prisma itself generates for this
-// schema (captured once via a local `db push`) are executed directly
-// through it.
+// logging). Both are replaced by the libSQL driver adapter (see
+// prisma.service.ts for the same swap on the app's normal query path, and
+// for why libSQL specifically rather than better-sqlite3) — the exact
+// CREATE TABLE/INDEX statements Prisma itself generates for this schema
+// (captured once via a local `db push`) are executed directly through it.
 const SCHEMA_SQL = [
   `CREATE TABLE IF NOT EXISTS "customers" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -107,12 +107,13 @@ async function ensureDatabaseSchemaInner() {
   const projectRoot = path.join(__dirname, ".."); // dist/ -> project root
   const dbPath = path.join(projectRoot, "revenue_recovery.db");
 
-  process.env.DATABASE_URL = `file:${dbPath}`;
-  log(`DATABASE_URL set to file:${dbPath}`);
+  const url = `file:${dbPath}`;
+  process.env.DATABASE_URL = url;
+  log(`DATABASE_URL set to ${url}`);
 
-  log("new PrismaClient() with better-sqlite3 adapter: start");
-  const prisma = new PrismaClient({ adapter: new PrismaBetterSQLite3({ url: dbPath }) });
-  log("new PrismaClient() with better-sqlite3 adapter: done");
+  log("new PrismaClient() with libSQL adapter: start");
+  const prisma = new PrismaClient({ adapter: new PrismaLibSQL({ url }) });
+  log("new PrismaClient() with libSQL adapter: done");
 
   try {
     for (let i = 0; i < SCHEMA_SQL.length; i++) {
