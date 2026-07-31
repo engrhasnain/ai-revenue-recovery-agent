@@ -12,13 +12,35 @@ import { AppConfigService } from "./config/app-config.service";
 // directly, bypassing npm's prestart lifecycle hooks — so the schema-push
 // step must not depend on npm running it. Do it here instead, before the
 // Nest app (and anything that queries the DB in onModuleInit, like seeding)
-// boots. Calls Prisma's CLI JS entry point directly with `node` rather than
+// boots.
+//
+// Two things deliberately avoid relying on `process.cwd()` or a relative
+// DATABASE_URL, since Hostinger's runtime working directory and which
+// source files survive deployment (it ships dist/ + node_modules/, but not
+// the original prisma/ source folder) turned out not to match local dev:
+//   1. The schema is read from a copy placed at dist/prisma/schema.prisma
+//      (see the "postbuild" script) and located via `__dirname`, which is
+//      always the compiled main.js's own folder regardless of cwd.
+//   2. DATABASE_URL is overridden to an absolute path before anything
+//      touches the database, so both this CLI call and the Nest app's own
+//      PrismaClient definitely open the exact same file.
+//
+// Calls Prisma's CLI JS entry point directly with `node` rather than
 // `npx prisma` (which can fetch a different major version instead of using
 // the one already installed) or the .bin wrapper (needs a shell on Windows).
 function ensureDatabaseSchema() {
-  const projectRoot = process.cwd();
+  const projectRoot = path.join(__dirname, ".."); // dist/ -> project root
+  const schemaPath = path.join(__dirname, "prisma", "schema.prisma");
   const prismaCli = path.join(projectRoot, "node_modules", "prisma", "build", "index.js");
+  const dbPath = path.join(projectRoot, "revenue_recovery.db");
 
+  process.env.DATABASE_URL = `file:${dbPath}`;
+
+  if (!fs.existsSync(schemaPath)) {
+    // eslint-disable-next-line no-console
+    console.error(`Prisma schema not found at ${schemaPath} — skipping schema push.`);
+    return;
+  }
   if (!fs.existsSync(prismaCli)) {
     // eslint-disable-next-line no-console
     console.error(`Prisma CLI not found at ${prismaCli} — skipping schema push.`);
@@ -28,8 +50,8 @@ function ensureDatabaseSchema() {
   try {
     execFileSync(
       process.execPath,
-      [prismaCli, "db", "push", "--accept-data-loss", "--skip-generate"],
-      { stdio: "inherit", cwd: projectRoot },
+      [prismaCli, "db", "push", "--schema", schemaPath, "--accept-data-loss", "--skip-generate"],
+      { stdio: "inherit", cwd: projectRoot, env: process.env },
     );
   } catch (err) {
     // eslint-disable-next-line no-console

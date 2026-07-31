@@ -7,6 +7,7 @@
     "prisma:generate": "prisma generate",
     "prebuild": "prisma generate",
     "build": "nest build",
+    "postbuild": "node -e \"const fs=require('fs');fs.mkdirSync('dist/prisma',{recursive:true});fs.copyFileSync('prisma/schema.prisma','dist/prisma/schema.prisma')\"",
     "postinstall": "prisma generate",
     "prestart": "prisma db push --accept-data-loss --skip-generate",
     "start": "nest start",
