@@ -82,14 +82,22 @@ function ensureDatabaseSchema() {
   }
 
   try {
-    execFileSync(
+    const result = execFileSync(
       process.execPath,
       [prismaCli, "db", "push", "--schema", schemaPath, "--accept-data-loss", "--skip-generate"],
-      { stdio: "inherit", cwd: projectRoot, env: process.env },
+      { cwd: projectRoot, env: process.env, timeout: 60_000 },
     );
-  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error("Prisma db push failed during startup:", err);
+    console.log(result.toString());
+  } catch (err) {
+    const e = err as { status?: number; signal?: string; stdout?: Buffer; stderr?: Buffer; message?: string };
+    // eslint-disable-next-line no-console
+    console.error(
+      `Prisma db push failed during startup — exit code: ${e.status}, signal: ${e.signal}\n` +
+        `--- stdout ---\n${e.stdout?.toString() || "(empty)"}\n` +
+        `--- stderr ---\n${e.stderr?.toString() || "(empty)"}\n` +
+        `--- message ---\n${e.message || "(none)"}`,
+    );
   }
 }
 
