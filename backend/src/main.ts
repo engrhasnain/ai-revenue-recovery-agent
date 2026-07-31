@@ -1,42 +1,109 @@
 import "dotenv/config";
 import "reflect-metadata";
-import { execFileSync } from "child_process";
 import * as path from "path";
 import * as fs from "fs";
+import { PrismaClient } from "@prisma/client";
 import { NestFactory } from "@nestjs/core";
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./app.module";
 import { AppConfigService } from "./config/app-config.service";
 
 // Some hosts (e.g. Hostinger's Node app runner) invoke `node dist/main.js`
-// directly, bypassing npm's prestart lifecycle hooks — so the schema-push
-// step must not depend on npm running it. Do it here instead, before the
-// Nest app (and anything that queries the DB in onModuleInit, like seeding)
+// directly, bypassing npm's prestart lifecycle hooks — so schema creation
+// must not depend on npm running it. Do it here instead, before the Nest
+// app (and anything that queries the DB in onModuleInit, like seeding)
 // boots.
 //
-// Two things deliberately avoid relying on `process.cwd()` or a relative
-// DATABASE_URL, since Hostinger's runtime working directory and which
-// source files survive deployment (it ships dist/ + node_modules/, but not
-// the original prisma/ source folder) turned out not to match local dev:
-//   1. The schema is read from a copy placed at dist/prisma/schema.prisma
-//      (see the "postbuild" script) and located via `__dirname`, which is
-//      always the compiled main.js's own folder regardless of cwd.
-//   2. DATABASE_URL is overridden to an absolute path before anything
-//      touches the database, so both this CLI call and the Nest app's own
-//      PrismaClient definitely open the exact same file.
-//
-// Calls Prisma's CLI JS entry point directly with `node` rather than
-// `npx prisma` (which can fetch a different major version instead of using
-// the one already installed) or the .bin wrapper (needs a shell on Windows).
-//
-// Prisma's native engine binaries (query engine, schema engine) also lose
-// their executable bit somewhere in Hostinger's deploy pipeline (build and
-// runtime appear to be separate filesystems/containers, and whatever copies
-// artifacts between them doesn't preserve permissions) — restore it on
-// every binary-looking file before anything tries to spawn one. This has
-// to run for the *app's own* query engine too (node_modules/.prisma/client),
-// not just the schema-engine used by db push, or the app boots fine here
-// but still crashes the moment a real request needs the database.
+// This deliberately avoids `prisma db push` (the CLI/schema-engine path) —
+// on Hostinger the schema-engine binary panics at runtime (likely a
+// build-container vs. runtime-container OpenSSL mismatch) even after fixing
+// its execute permission. Instead, the exact CREATE TABLE/INDEX statements
+// Prisma itself generates for this schema (captured once via a local
+// `db push` and pasted in below) are executed directly through the query
+// engine, which — unlike the schema-engine — now has multi-platform
+// binaries bundled via `binaryTargets` in schema.prisma and is confirmed
+// working.
+const SCHEMA_SQL = [
+  `CREATE TABLE IF NOT EXISTS "customers" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "phone" TEXT,
+    "whatsapp" TEXT,
+    "company" TEXT,
+    "country" TEXT,
+    "address" TEXT,
+    "risk_level" TEXT NOT NULL DEFAULT 'low',
+    "total_outstanding" REAL NOT NULL DEFAULT 0,
+    "notes" TEXT,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE TABLE IF NOT EXISTS "invoices" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "invoice_number" TEXT NOT NULL,
+    "customer_id" INTEGER NOT NULL,
+    "amount" REAL NOT NULL,
+    "amount_paid" REAL NOT NULL DEFAULT 0,
+    "currency" TEXT NOT NULL DEFAULT 'USD',
+    "issue_date" DATETIME NOT NULL,
+    "due_date" DATETIME NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "description" TEXT,
+    "days_overdue" INTEGER NOT NULL DEFAULT 0,
+    "reminder_count" INTEGER NOT NULL DEFAULT 0,
+    "last_reminder_at" DATETIME,
+    "escalated_at" DATETIME,
+    "notes" TEXT,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "invoices_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "customers" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+  )`,
+  `CREATE TABLE IF NOT EXISTS "payment_plans" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "customer_id" INTEGER NOT NULL,
+    "invoice_id" INTEGER NOT NULL,
+    "total_amount" REAL NOT NULL,
+    "installments" INTEGER NOT NULL,
+    "installment_amount" REAL NOT NULL,
+    "frequency" TEXT NOT NULL DEFAULT 'monthly',
+    "start_date" DATETIME NOT NULL,
+    "next_due_date" DATETIME NOT NULL,
+    "amount_paid" REAL NOT NULL DEFAULT 0,
+    "installments_paid" INTEGER NOT NULL DEFAULT 0,
+    "status" TEXT NOT NULL DEFAULT 'active',
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "payment_plans_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "customers" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "payment_plans_invoice_id_fkey" FOREIGN KEY ("invoice_id") REFERENCES "invoices" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+  )`,
+  `CREATE TABLE IF NOT EXISTS "reminders" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "customer_id" INTEGER NOT NULL,
+    "invoice_id" INTEGER NOT NULL,
+    "channel" TEXT NOT NULL,
+    "reminder_type" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "subject" TEXT,
+    "message" TEXT NOT NULL,
+    "ai_generated" BOOLEAN NOT NULL DEFAULT true,
+    "sent_at" DATETIME,
+    "response_received" BOOLEAN NOT NULL DEFAULT false,
+    "response_text" TEXT,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "reminders_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "customers" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "reminders_invoice_id_fkey" FOREIGN KEY ("invoice_id") REFERENCES "invoices" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS "customers_email_key" ON "customers"("email")`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS "invoices_invoice_number_key" ON "invoices"("invoice_number")`,
+];
+
+// Prisma's native engine binaries also lose their executable bit somewhere
+// in Hostinger's deploy pipeline (build and runtime appear to be separate
+// filesystems/containers, and whatever copies artifacts between them
+// doesn't preserve permissions) — restore it on every binary-looking file
+// before the query engine (used below, and by the app's own PrismaService)
+// tries to load one.
 function restoreEngineExecutePermissions(projectRoot: string) {
   const dirs = [
     path.join(projectRoot, "node_modules", "@prisma"),
@@ -61,48 +128,30 @@ function restoreEngineExecutePermissions(projectRoot: string) {
   dirs.forEach(walk);
 }
 
-function ensureDatabaseSchema() {
+async function ensureDatabaseSchema() {
   const projectRoot = path.join(__dirname, ".."); // dist/ -> project root
-  const schemaPath = path.join(__dirname, "prisma", "schema.prisma");
-  const prismaCli = path.join(projectRoot, "node_modules", "prisma", "build", "index.js");
   const dbPath = path.join(projectRoot, "revenue_recovery.db");
 
   process.env.DATABASE_URL = `file:${dbPath}`;
   restoreEngineExecutePermissions(projectRoot);
 
-  if (!fs.existsSync(schemaPath)) {
-    // eslint-disable-next-line no-console
-    console.error(`Prisma schema not found at ${schemaPath} — skipping schema push.`);
-    return;
-  }
-  if (!fs.existsSync(prismaCli)) {
-    // eslint-disable-next-line no-console
-    console.error(`Prisma CLI not found at ${prismaCli} — skipping schema push.`);
-    return;
-  }
-
+  const prisma = new PrismaClient();
   try {
-    const result = execFileSync(
-      process.execPath,
-      [prismaCli, "db", "push", "--schema", schemaPath, "--accept-data-loss", "--skip-generate"],
-      { cwd: projectRoot, env: process.env, timeout: 60_000 },
-    );
+    for (const statement of SCHEMA_SQL) {
+      await prisma.$executeRawUnsafe(statement);
+    }
     // eslint-disable-next-line no-console
-    console.log(result.toString());
+    console.log("Database schema ensured (customers, invoices, payment_plans, reminders).");
   } catch (err) {
-    const e = err as { status?: number; signal?: string; stdout?: Buffer; stderr?: Buffer; message?: string };
     // eslint-disable-next-line no-console
-    console.error(
-      `Prisma db push failed during startup — exit code: ${e.status}, signal: ${e.signal}\n` +
-        `--- stdout ---\n${e.stdout?.toString() || "(empty)"}\n` +
-        `--- stderr ---\n${e.stderr?.toString() || "(empty)"}\n` +
-        `--- message ---\n${e.message || "(none)"}`,
-    );
+    console.error("Failed to create database schema:", err);
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
 async function bootstrap() {
-  ensureDatabaseSchema();
+  await ensureDatabaseSchema();
 
   const app = await NestFactory.create(AppModule);
 
