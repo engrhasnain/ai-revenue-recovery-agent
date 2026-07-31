@@ -1,11 +1,45 @@
 import "dotenv/config";
 import "reflect-metadata";
+import { execFileSync } from "child_process";
+import * as path from "path";
+import * as fs from "fs";
 import { NestFactory } from "@nestjs/core";
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./app.module";
 import { AppConfigService } from "./config/app-config.service";
 
+// Some hosts (e.g. Hostinger's Node app runner) invoke `node dist/main.js`
+// directly, bypassing npm's prestart lifecycle hooks — so the schema-push
+// step must not depend on npm running it. Do it here instead, before the
+// Nest app (and anything that queries the DB in onModuleInit, like seeding)
+// boots. Calls Prisma's CLI JS entry point directly with `node` rather than
+// `npx prisma` (which can fetch a different major version instead of using
+// the one already installed) or the .bin wrapper (needs a shell on Windows).
+function ensureDatabaseSchema() {
+  const projectRoot = process.cwd();
+  const prismaCli = path.join(projectRoot, "node_modules", "prisma", "build", "index.js");
+
+  if (!fs.existsSync(prismaCli)) {
+    // eslint-disable-next-line no-console
+    console.error(`Prisma CLI not found at ${prismaCli} — skipping schema push.`);
+    return;
+  }
+
+  try {
+    execFileSync(
+      process.execPath,
+      [prismaCli, "db", "push", "--accept-data-loss", "--skip-generate"],
+      { stdio: "inherit", cwd: projectRoot },
+    );
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("Prisma db push failed during startup:", err);
+  }
+}
+
 async function bootstrap() {
+  ensureDatabaseSchema();
+
   const app = await NestFactory.create(AppModule);
 
   const config = app.get(AppConfigService);
