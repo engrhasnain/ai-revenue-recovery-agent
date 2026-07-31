@@ -4,13 +4,16 @@
 // can pass values straight through without remapping keys.
 
 generator client {
-  provider      = "prisma-client-js"
-  // Hostinger's build container and runtime container are apparently
-  // different environments (different OpenSSL versions) — ship engine
-  // binaries for every likely Debian/Ubuntu OpenSSL variant plus musl
-  // (Alpine) so Prisma can pick whichever one actually matches at runtime,
-  // instead of the single "native" guess made at build time.
-  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+  provider = "prisma-client-js"
+  // Prisma's own native query engine hangs indefinitely on Hostinger's
+  // Node hosting on the very first query (confirmed via step-by-step
+  // startup logging on the sibling Lead-to-Deal project — likely the
+  // engine's internal process/thread model is blocked by their
+  // sandboxing). Driver adapters (stable, no preview flag needed) let
+  // Prisma Client's query API stay exactly the same everywhere it's used
+  // in the app, while swapping the actual SQLite access to
+  // better-sqlite3 — a much simpler, synchronous native binding with no
+  // separate engine process and no OpenSSL dependency.
 }
 
 datasource db {

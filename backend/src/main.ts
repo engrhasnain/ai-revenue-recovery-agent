@@ -1,8 +1,8 @@
 import "dotenv/config";
 import "reflect-metadata";
 import * as path from "path";
-import * as fs from "fs";
 import { PrismaClient } from "@prisma/client";
+import { PrismaBetterSQLite3 } from "@prisma/adapter-better-sqlite3";
 import { NestFactory } from "@nestjs/core";
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./app.module";
@@ -14,15 +14,15 @@ import { AppConfigService } from "./config/app-config.service";
 // app (and anything that queries the DB in onModuleInit, like seeding)
 // boots.
 //
-// This deliberately avoids `prisma db push` (the CLI/schema-engine path) —
-// on Hostinger the schema-engine binary panics at runtime (likely a
-// build-container vs. runtime-container OpenSSL mismatch) even after fixing
-// its execute permission. Instead, the exact CREATE TABLE/INDEX statements
-// Prisma itself generates for this schema (captured once via a local
-// `db push` and pasted in below) are executed directly through the query
-// engine, which — unlike the schema-engine — now has multi-platform
-// binaries bundled via `binaryTargets` in schema.prisma and is confirmed
-// working.
+// This deliberately avoids `prisma db push` and Prisma's own native query
+// engine entirely — on Hostinger the schema-engine binary panics at
+// startup, and even after routing around it, the native query engine hangs
+// indefinitely on its very first query (confirmed via step-by-step startup
+// logging). Both are replaced by the better-sqlite3 driver adapter (see
+// prisma.service.ts for the same swap on the app's normal query path) — the
+// exact CREATE TABLE/INDEX statements Prisma itself generates for this
+// schema (captured once via a local `db push`) are executed directly
+// through it.
 const SCHEMA_SQL = [
   `CREATE TABLE IF NOT EXISTS "customers" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -98,36 +98,6 @@ const SCHEMA_SQL = [
   `CREATE UNIQUE INDEX IF NOT EXISTS "invoices_invoice_number_key" ON "invoices"("invoice_number")`,
 ];
 
-// Prisma's native engine binaries also lose their executable bit somewhere
-// in Hostinger's deploy pipeline (build and runtime appear to be separate
-// filesystems/containers, and whatever copies artifacts between them
-// doesn't preserve permissions) — restore it on every binary-looking file
-// before the query engine (used below, and by the app's own PrismaService)
-// tries to load one.
-function restoreEngineExecutePermissions(projectRoot: string) {
-  const dirs = [
-    path.join(projectRoot, "node_modules", "@prisma"),
-    path.join(projectRoot, "node_modules", ".prisma"),
-  ];
-  const walk = (dir: string) => {
-    if (!fs.existsSync(dir)) return;
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        walk(full);
-      } else if (/engine/i.test(entry.name)) {
-        try {
-          fs.chmodSync(full, 0o755);
-        } catch (err) {
-          // eslint-disable-next-line no-console
-          console.error(`Could not chmod ${full}:`, err);
-        }
-      }
-    }
-  };
-  dirs.forEach(walk);
-}
-
 function log(msg: string) {
   // eslint-disable-next-line no-console
   console.log(`[schema-init ${new Date().toISOString()}] ${msg}`);
@@ -140,13 +110,9 @@ async function ensureDatabaseSchemaInner() {
   process.env.DATABASE_URL = `file:${dbPath}`;
   log(`DATABASE_URL set to file:${dbPath}`);
 
-  log("restoreEngineExecutePermissions: start");
-  restoreEngineExecutePermissions(projectRoot);
-  log("restoreEngineExecutePermissions: done");
-
-  log("new PrismaClient(): start");
-  const prisma = new PrismaClient();
-  log("new PrismaClient(): done");
+  log("new PrismaClient() with better-sqlite3 adapter: start");
+  const prisma = new PrismaClient({ adapter: new PrismaBetterSQLite3({ url: dbPath }) });
+  log("new PrismaClient() with better-sqlite3 adapter: done");
 
   try {
     for (let i = 0; i < SCHEMA_SQL.length; i++) {
@@ -165,19 +131,21 @@ async function ensureDatabaseSchemaInner() {
   }
 }
 
-// Whatever is actually hanging here (still being diagnosed on Hostinger — see
-// the step-by-step "[schema-init]" log lines above/below this call), the
-// server must come up regardless: race the real setup against a hard
-// timeout so `app.listen()` always gets called within Hostinger's own
-// startup window, rather than the whole process going dark.
+// Belt-and-suspenders: the better-sqlite3 adapter fixed the actual hang, but
+// keep a hard timeout so `app.listen()` always gets called within
+// Hostinger's own startup window no matter what — the timer is cancelled
+// as soon as the real work finishes, so it won't fire (or log) on the
+// normal, fast path.
 async function ensureDatabaseSchema() {
+  let timer: ReturnType<typeof setTimeout>;
   const timeout = new Promise<void>((resolve) => {
-    setTimeout(() => {
+    timer = setTimeout(() => {
       log("TIMEOUT after 8s — proceeding to start the server anyway.");
       resolve();
     }, 8000);
   });
   await Promise.race([ensureDatabaseSchemaInner(), timeout]);
+  clearTimeout(timer!);
 }
 
 async function bootstrap() {
