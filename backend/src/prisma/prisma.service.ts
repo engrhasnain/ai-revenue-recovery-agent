@@ -11,9 +11,15 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     // libSQL driver adapter — see schema.prisma for why (Prisma's native
     // query engine hangs on Hostinger; better-sqlite3 can't compile there
     // either). Unlike better-sqlite3, libSQL's url uses the "file:" scheme
-    // directly, matching config.databaseUrl as-is.
+    // directly, matching config.databaseUrl as-is. On Vercel, config.databaseUrl
+    // instead holds a remote "libsql://..." URL (e.g. Turso) since there's no
+    // persistent local disk shared across instances — the same adapter
+    // handles both, given the matching auth token.
     super({
-      adapter: new PrismaLibSQL({ url: config.databaseUrl }),
+      adapter: new PrismaLibSQL({
+        url: config.databaseUrl,
+        authToken: process.env.TURSO_AUTH_TOKEN || undefined,
+      }),
       log: config.debug ? ["query", "warn", "error"] : ["warn", "error"],
     });
   }

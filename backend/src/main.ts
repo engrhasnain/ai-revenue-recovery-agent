@@ -104,15 +104,19 @@ function log(msg: string) {
 }
 
 async function ensureDatabaseSchemaInner() {
+  // A real DATABASE_URL (e.g. a remote "libsql://..." Turso database, needed
+  // on hosts like Vercel with no persistent local disk shared across
+  // instances) always wins; only fall back to a local file when unset, for
+  // plain local development.
   const projectRoot = path.join(__dirname, ".."); // dist/ -> project root
   const dbPath = path.join(projectRoot, "revenue_recovery.db");
-
-  const url = `file:${dbPath}`;
+  const url = process.env.DATABASE_URL || `file:${dbPath}`;
+  const authToken = process.env.TURSO_AUTH_TOKEN || undefined;
   process.env.DATABASE_URL = url;
   log(`DATABASE_URL set to ${url}`);
 
   log("new PrismaClient() with libSQL adapter: start");
-  const prisma = new PrismaClient({ adapter: new PrismaLibSQL({ url }) });
+  const prisma = new PrismaClient({ adapter: new PrismaLibSQL({ url, authToken }) });
   log("new PrismaClient() with libSQL adapter: done");
 
   try {
