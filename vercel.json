@@ -5,7 +5,7 @@
     },
     "backend": {
       "root": "backend/",
-      "entrypoint": "dist/main.js",
+      "entrypoint": "server.js",
       "installCommand": "npm install",
       "buildCommand": "npm run build"
     }
